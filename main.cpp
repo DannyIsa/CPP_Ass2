@@ -1,7 +1,9 @@
 #include <iostream>
+#include "square_mat.h"
+
+using namespace matrix;
 
 int main()
 {
-    std::cout << "Hello, World!" << std::endl;
     return 0;
 }
