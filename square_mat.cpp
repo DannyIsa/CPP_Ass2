@@ -97,7 +97,7 @@ namespace matrix
     // Assignment operator - for statements like m1 = m2
     SquareMat &SquareMat::operator=(const SquareMat &other)
     {
-        // Check for self-assignment (like m1 = m1)
+        // Check for cases like m1 = m1
         if (this == &other)
             return *this;
 
@@ -582,7 +582,6 @@ namespace matrix
     // Greater than operator (m1 > m2)
     bool SquareMat::operator>(const SquareMat &other) const
     {
-        // Matrix is greater than another if its sum is greater
         return calculateSum() > other.calculateSum();
     }
 
