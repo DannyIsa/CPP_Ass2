@@ -1,0 +1,806 @@
+this is my function:
+SquareMat &SquareMat::operator++()
+    {
+        // Add 1 to each element
+        for (int i = 0; i < size; i++)
+        {
+            for (int j = 0; j < size; j++)
+            {
+                data[i][j] += 1.0;
+            }
+        }
+        return *this; // Return reference to this object
+    }
+how do i create a Post-increment method?
+
+---
+To create a post-increment method (operator++(int)) for your SquareMat class, you'll need to implement it differently from your pre-increment operator.
+
+The key difference is that post-increment should:
+1. Return a copy of the original object (before incrementing)
+2. Then increment the actual object
+3. Use the parameter 'int' (which isn't actually used) to distinguish it from pre-increment
+
+Here's how you would implement it:
+
+```cpp
+SquareMat SquareMat::operator++(int)
+{
+    SquareMat temp = *this;  // Create a copy of the current object
+    
+    // Add 1 to each element in the original object
+    for (int i = 0; i < size; i++)
+    {
+        for (int j = 0; j < size; j++)
+        {
+            data[i][j] += 1.0;
+        }
+    }
+    
+    return temp;  // Return the unmodified copy
+}
+```
+
+The key differences from your pre-increment operator are:
+- The dummy 'int' parameter distinguishes this as post-increment
+- It returns a copy by value (not a reference)
+- It returns the original state before modification
+
+Would you like me to explain how this works in more detail?
+---
+
+this is my matrix class <attached code>
+how can i create simple test to check each method?
+i want a simple way, the assertion input receives: actual output and expected output
+
+---
+I'll help you create a simple test framework to check each method of your SquareMat class. We'll implement a basic assertion function and create tests for each method to ensure they work correctly.
+
+#include "square_mat.h"
+#include <iostream>
+#include <string>
+#include <vector>
+#include <functional>
+#include <cmath>
+
+// Simple assertion function
+void assert_equal(const std::string& test_name, double actual, double expected, double epsilon = 0.00001) {
+    if (std::abs(actual - expected) < epsilon) {
+        std::cout << "✓ " << test_name << " passed!" << std::endl;
+    } else {
+        std::cout << "✗ " << test_name << " failed! Expected: " << expected << ", Got: " << actual << std::endl;
+    }
+}
+
+// Assertion for matrices
+void assert_matrix_equal(const std::string& test_name, const SquareMat& actual, const SquareMat& expected, double epsilon = 0.00001) {
+    int size = actual.size;
+    bool equal = true;
+    
+    if (size != expected.size) {
+        std::cout << "✗ " << test_name << " failed! Matrices have different sizes!" << std::endl;
+        return;
+    }
+    
+    for (int i = 0; i < size; i++) {
+        for (int j = 0; j < size; j++) {
+            if (std::abs(actual[i][j] - expected[i][j]) >= epsilon) {
+                equal = false;
+                std::cout << "✗ " << test_name << " failed! Difference at [" << i << "][" << j 
+                          << "]. Expected: " << expected[i][j] << ", Got: " << actual[i][j] << std::endl;
+                return;
+            }
+        }
+    }
+    
+    if (equal) {
+        std::cout << "✓ " << test_name << " passed!" << std::endl;
+    }
+}
+
+// Boolean assertion
+void assert_true(const std::string& test_name, bool condition) {
+    if (condition) {
+        std::cout << "✓ " << test_name << " passed!" << std::endl;
+    } else {
+        std::cout << "✗ " << test_name << " failed!" << std::endl;
+    }
+}
+
+// Helper function to create matrices
+SquareMat create_test_matrix(int size, double initial_value = 1.0) {
+    double** arr = new double*[size];
+    for (int i = 0; i < size; i++) {
+        arr[i] = new double[size];
+        for (int j = 0; j < size; j++) {
+            arr[i][j] = initial_value + i + j;
+        }
+    }
+    
+    SquareMat mat(arr, size);
+    
+    // Free memory
+    for (int i = 0; i < size; i++) {
+        delete[] arr[i];
+    }
+    delete[] arr;
+    
+    return mat;
+}
+
+// Helper function to create identity matrix
+SquareMat create_identity_matrix(int size) {
+    double** arr = new double*[size];
+    for (int i = 0; i < size; i++) {
+        arr[i] = new double[size];
+        for (int j = 0; j < size; j++) {
+            arr[i][j] = (i == j) ? 1.0 : 0.0;
+        }
+    }
+    
+    SquareMat mat(arr, size);
+    
+    // Free memory
+    for (int i = 0; i < size; i++) {
+        delete[] arr[i];
+    }
+    delete[] arr;
+    
+    return mat;
+}
+
+// Create a specific 2x2 matrix for determinant testing
+SquareMat create_2x2_matrix(double a, double b, double c, double d) {
+    double** arr = new double*[2];
+    arr[0] = new double[2];
+    arr[1] = new double[2];
+    
+    arr[0][0] = a;
+    arr[0][1] = b;
+    arr[1][0] = c;
+    arr[1][1] = d;
+    
+    SquareMat mat(arr, 2);
+    
+    delete[] arr[0];
+    delete[] arr[1];
+    delete[] arr;
+    
+    return mat;
+}
+
+// Create a specific 3x3 matrix
+SquareMat create_3x3_matrix(double a, double b, double c, 
+                          double d, double e, double f, 
+                          double g, double h, double i) {
+    double** arr = new double*[3];
+    arr[0] = new double[3];
+    arr[1] = new double[3];
+    arr[2] = new double[3];
+    
+    arr[0][0] = a; arr[0][1] = b; arr[0][2] = c;
+    arr[1][0] = d; arr[1][1] = e; arr[1][2] = f;
+    arr[2][0] = g; arr[2][1] = h; arr[2][2] = i;
+    
+    SquareMat mat(arr, 3);
+    
+    delete[] arr[0];
+    delete[] arr[1];
+    delete[] arr[2];
+    delete[] arr;
+    
+    return mat;
+}
+
+// Test class with all the tests
+class SquareMatTests {
+public:
+    // Run all tests
+    void run_all_tests() {
+        test_constructors();
+        test_assignment();
+        test_access_operators();
+        test_addition();
+        test_subtraction();
+        test_unary_minus();
+        test_multiplication();
+        test_scalar_multiplication();
+        test_element_wise_multiplication();
+        test_modulo();
+        test_division();
+        test_power();
+        test_increment_decrement();
+        test_transpose();
+        test_comparison_operators();
+        test_determinant();
+        test_compound_operators();
+    }
+
+private:
+    // Test constructors
+    void test_constructors() {
+        std::cout << "\n=== Testing Constructors ===" << std::endl;
+        
+        // Test size constructor
+        SquareMat m1(3);
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                assert_equal("Size Constructor Zero Values", m1[i][j], 0.0);
+            }
+        }
+        
+        // Test array constructor
+        SquareMat m2 = create_test_matrix(3);
+        assert_equal("Array Constructor Values", m2[0][0], 1.0);
+        assert_equal("Array Constructor Values", m2[1][1], 3.0);
+        assert_equal("Array Constructor Values", m2[2][2], 5.0);
+        
+        // Test copy constructor
+        SquareMat m3(m2);
+        assert_matrix_equal("Copy Constructor", m3, m2);
+    }
+    
+    // Test assignment operator
+    void test_assignment() {
+        std::cout << "\n=== Testing Assignment Operator ===" << std::endl;
+        
+        SquareMat m1 = create_test_matrix(3);
+        SquareMat m2(2);
+        
+        m2 = m1;
+        assert_matrix_equal("Assignment Operator", m2, m1);
+        
+        // Self-assignment
+        m1 = m1;
+        assert_matrix_equal("Self Assignment", m1, create_test_matrix(3));
+    }
+    
+    // Test access operators
+    void test_access_operators() {
+        std::cout << "\n=== Testing Access Operators ===" << std::endl;
+        
+        SquareMat m = create_test_matrix(3);
+        assert_equal("Access Operator [0][0]", m[0][0], 1.0);
+        assert_equal("Access Operator [1][2]", m[1][2], 4.0);
+        assert_equal("Access Operator [2][1]", m[2][1], 4.0);
+    }
+    
+    // Test addition
+    void test_addition() {
+        std::cout << "\n=== Testing Addition ===" << std::endl;
+        
+        SquareMat m1 = create_test_matrix(3, 1.0);
+        SquareMat m2 = create_test_matrix(3, 2.0);
+        
+        SquareMat result = m1 + m2;
+        
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                assert_equal("Addition", result[i][j], m1[i][j] + m2[i][j]);
+            }
+        }
+        
+        // Different sizes
+        SquareMat m3(2);
+        SquareMat empty_result = m1 + m3;
+        assert_equal("Addition Different Sizes", empty_result.size, 0);
+    }
+    
+    // Test subtraction
+    void test_subtraction() {
+        std::cout << "\n=== Testing Subtraction ===" << std::endl;
+        
+        SquareMat m1 = create_test_matrix(3, 5.0);
+        SquareMat m2 = create_test_matrix(3, 2.0);
+        
+        SquareMat result = m1 - m2;
+        
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                assert_equal("Subtraction", result[i][j], m1[i][j] - m2[i][j]);
+            }
+        }
+        
+        // Different sizes
+        SquareMat m3(2);
+        SquareMat empty_result = m1 - m3;
+        assert_equal("Subtraction Different Sizes", empty_result.size, 0);
+    }
+    
+    // Test unary minus
+    void test_unary_minus() {
+        std::cout << "\n=== Testing Unary Minus ===" << std::endl;
+        
+        SquareMat m = create_test_matrix(3);
+        SquareMat result = -m;
+        
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                assert_equal("Unary Minus", result[i][j], -m[i][j]);
+            }
+        }
+    }
+    
+    // Test matrix multiplication
+    void test_multiplication() {
+        std::cout << "\n=== Testing Matrix Multiplication ===" << std::endl;
+        
+        // 2x2 matrix multiplication
+        SquareMat m1 = create_2x2_matrix(1, 2, 3, 4);
+        SquareMat m2 = create_2x2_matrix(5, 6, 7, 8);
+        
+        SquareMat result = m1 * m2;
+        
+        assert_equal("Matrix Multiplication [0][0]", result[0][0], 19.0);
+        assert_equal("Matrix Multiplication [0][1]", result[0][1], 22.0);
+        assert_equal("Matrix Multiplication [1][0]", result[1][0], 43.0);
+        assert_equal("Matrix Multiplication [1][1]", result[1][1], 50.0);
+        
+        // Identity properties
+        SquareMat identity = create_identity_matrix(3);
+        SquareMat m3 = create_test_matrix(3);
+        
+        SquareMat id_result = m3 * identity;
+        assert_matrix_equal("Multiplication with Identity", id_result, m3);
+        
+        // Different sizes
+        SquareMat m4(2);
+        SquareMat empty_result = m3 * m4;
+        assert_equal("Multiplication Different Sizes", empty_result.size, 0);
+    }
+    
+    // Test scalar multiplication
+    void test_scalar_multiplication() {
+        std::cout << "\n=== Testing Scalar Multiplication ===" << std::endl;
+        
+        SquareMat m = create_test_matrix(3);
+        double scalar = 2.5;
+        
+        // Test m * scalar
+        SquareMat result1 = m * scalar;
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                assert_equal("Matrix * Scalar", result1[i][j], m[i][j] * scalar);
+            }
+        }
+        
+        // Test scalar * m
+        SquareMat result2 = scalar * m;
+        assert_matrix_equal("Scalar * Matrix", result2, result1);
+    }
+    
+    // Test element-wise multiplication
+    void test_element_wise_multiplication() {
+        std::cout << "\n=== Testing Element-wise Multiplication ===" << std::endl;
+        
+        SquareMat m1 = create_test_matrix(3, 1.0);
+        SquareMat m2 = create_test_matrix(3, 2.0);
+        
+        SquareMat result = m1 % m2;
+        
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                assert_equal("Element-wise Multiplication", result[i][j], m1[i][j] * m2[i][j]);
+            }
+        }
+        
+        // Different sizes
+        SquareMat m3(2);
+        SquareMat empty_result = m1 % m3;
+        assert_equal("Element-wise Multiplication Different Sizes", empty_result.size, 0);
+    }
+    
+    // Test modulo
+    void test_modulo() {
+        std::cout << "\n=== Testing Modulo ===" << std::endl;
+        
+        SquareMat m = create_test_matrix(3, 5.0);
+        int scalar = 3;
+        
+        SquareMat result = m % scalar;
+        
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                assert_equal("Modulo", result[i][j], (int)m[i][j] % scalar);
+            }
+        }
+        
+        // Test division by zero
+        SquareMat zero_result = m % 0;
+        assert_equal("Modulo by Zero", zero_result.size, 0);
+    }
+    
+    // Test division
+    void test_division() {
+        std::cout << "\n=== Testing Division ===" << std::endl;
+        
+        SquareMat m = create_test_matrix(3);
+        double scalar = 2.0;
+        
+        SquareMat result = m / scalar;
+        
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                assert_equal("Division", result[i][j], m[i][j] / scalar);
+            }
+        }
+        
+        // Test division by zero
+        SquareMat zero_result = m / 0.0;
+        assert_equal("Division by Zero", zero_result.size, 0);
+    }
+    
+    // Test power
+    void test_power() {
+        std::cout << "\n=== Testing Power ===" << std::endl;
+        
+        // Test power of 0 (identity)
+        SquareMat m1 = create_test_matrix(3);
+        SquareMat result1 = m1 ^ 0;
+        assert_matrix_equal("Power 0", result1, create_identity_matrix(3));
+        
+        // Test power of 1 (same matrix)
+        SquareMat result2 = m1 ^ 1;
+        assert_matrix_equal("Power 1", result2, m1);
+        
+        // Test power of 2
+        SquareMat result3 = m1 ^ 2;
+        SquareMat expected = m1 * m1;
+        assert_matrix_equal("Power 2", result3, expected);
+        
+        // Test negative power
+        SquareMat result4 = m1 ^ (-1);
+        assert_equal("Negative Power", result4.size, 0);
+    }
+    
+    // Test increment and decrement
+    void test_increment_decrement() {
+        std::cout << "\n=== Testing Increment/Decrement ===" << std::endl;
+        
+        // Test pre-increment
+        SquareMat m1 = create_test_matrix(3);
+        SquareMat m1_copy = m1;
+        SquareMat result1 = ++m1;
+        
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                assert_equal("Pre-increment Value", m1[i][j], m1_copy[i][j] + 1.0);
+            }
+        }
+        assert_matrix_equal("Pre-increment Return", result1, m1);
+        
+        // Test post-increment
+        SquareMat m2 = create_test_matrix(3);
+        SquareMat m2_copy = m2;
+        SquareMat result2 = m2++;
+        
+        assert_matrix_equal("Post-increment Return", result2, m2_copy);
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                assert_equal("Post-increment Value", m2[i][j], m2_copy[i][j] + 1.0);
+            }
+        }
+        
+        // Test pre-decrement
+        SquareMat m3 = create_test_matrix(3);
+        SquareMat m3_copy = m3;
+        SquareMat result3 = --m3;
+        
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                assert_equal("Pre-decrement Value", m3[i][j], m3_copy[i][j] - 1.0);
+            }
+        }
+        assert_matrix_equal("Pre-decrement Return", result3, m3);
+        
+        // Test post-decrement
+        SquareMat m4 = create_test_matrix(3);
+        SquareMat m4_copy = m4;
+        SquareMat result4 = m4--;
+        
+        assert_matrix_equal("Post-decrement Return", result4, m4_copy);
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                assert_equal("Post-decrement Value", m4[i][j], m4_copy[i][j] - 1.0);
+            }
+        }
+    }
+    
+    // Test transpose
+    void test_transpose() {
+        std::cout << "\n=== Testing Transpose ===" << std::endl;
+        
+        // Create a non-symmetric matrix
+        SquareMat m = create_3x3_matrix(1, 2, 3, 4, 5, 6, 7, 8, 9);
+        SquareMat result = ~m;
+        
+        assert_equal("Transpose [0][1]", result[0][1], m[1][0]);
+        assert_equal("Transpose [1][0]", result[1][0], m[0][1]);
+        assert_equal("Transpose [0][2]", result[0][2], m[2][0]);
+        assert_equal("Transpose [2][0]", result[2][0], m[0][2]);
+        assert_equal("Transpose [1][2]", result[1][2], m[2][1]);
+        assert_equal("Transpose [2][1]", result[2][1], m[1][2]);
+        
+        // Diagonal elements remain the same
+        assert_equal("Transpose [0][0]", result[0][0], m[0][0]);
+        assert_equal("Transpose [1][1]", result[1][1], m[1][1]);
+        assert_equal("Transpose [2][2]", result[2][2], m[2][2]);
+        
+        // Double transpose should be the original matrix
+        SquareMat double_transpose = ~result;
+        assert_matrix_equal("Double Transpose", double_transpose, m);
+    }
+    
+    // Test comparison operators
+    void test_comparison_operators() {
+        std::cout << "\n=== Testing Comparison Operators ===" << std::endl;
+        
+        SquareMat m1 = create_test_matrix(3, 1.0);
+        SquareMat m2 = create_test_matrix(3, 2.0);
+        SquareMat m1_copy = create_test_matrix(3, 1.0);
+        
+        // Test ==
+        assert_true("Equality (==) with same matrix", m1 == m1_copy);
+        assert_true("Inequality (!=) with different matrix", m1 != m2);
+        
+        // Test < and >
+        assert_true("Less than (<)", m1 < m2);
+        assert_true("Greater than (>)", m2 > m1);
+        
+        // Test <= and >=
+        assert_true("Less than or equal (<=) with different matrices", m1 <= m2);
+        assert_true("Less than or equal (<=) with equal matrices", m1 <= m1_copy);
+        assert_true("Greater than or equal (>=) with different matrices", m2 >= m1);
+        assert_true("Greater than or equal (>=) with equal matrices", m1 >= m1_copy);
+    }
+    
+    // Test determinant
+    void test_determinant() {
+        std::cout << "\n=== Testing Determinant ===" << std::endl;
+        
+        // 1x1 matrix
+        double val = 5.0;
+        double** arr1 = new double*[1];
+        arr1[0] = new double[1];
+        arr1[0][0] = val;
+        SquareMat m1(arr1, 1);
+        delete[] arr1[0];
+        delete[] arr1;
+        
+        assert_equal("Determinant 1x1", !m1, val);
+        
+        // 2x2 matrix
+        SquareMat m2 = create_2x2_matrix(1, 2, 3, 4);
+        // det = 1*4 - 2*3 = 4 - 6 = -2
+        assert_equal("Determinant 2x2", !m2, -2.0);
+        
+        // 3x3 matrix
+        SquareMat m3 = create_3x3_matrix(1, 2, 3, 4, 5, 6, 7, 8, 9);
+        // det = 1*(5*9 - 6*8) - 2*(4*9 - 6*7) + 3*(4*8 - 5*7)
+        //     = 1*(45 - 48) - 2*(36 - 42) + 3*(32 - 35)
+        //     = 1*(-3) - 2*(-6) + 3*(-3)
+        //     = -3 + 12 - 9 = 0
+        assert_equal("Determinant 3x3", !m3, 0.0);
+        
+        // Non-zero determinant
+        SquareMat m4 = create_3x3_matrix(2, 3, 1, 4, 1, 3, 2, 5, 2);
+        // det = 2*(1*2 - 3*5) - 3*(4*2 - 3*2) + 1*(4*5 - 1*2)
+        //     = 2*(-13) - 3*(8 - 6) + 1*(20 - 2)
+        //     = -26 - 3*2 + 18
+        //     = -26 - 6 + 18 = -14
+        assert_equal("Determinant 3x3 non-zero", !m4, -14.0);
+    }
+    
+    // Test compound operators
+    void test_compound_operators() {
+        std::cout << "\n=== Testing Compound Operators ===" << std::endl;
+        
+        // Test +=
+        SquareMat m1 = create_test_matrix(3, 1.0);
+        SquareMat m2 = create_test_matrix(3, 2.0);
+        SquareMat expected_add = m1 + m2;
+        
+        m1 += m2;
+        assert_matrix_equal("Compound Addition (+=)", m1, expected_add);
+        
+        // Test -=
+        SquareMat m3 = create_test_matrix(3, 5.0);
+        SquareMat m4 = create_test_matrix(3, 2.0);
+        SquareMat expected_sub = m3 - m4;
+        
+        m3 -= m4;
+        assert_matrix_equal("Compound Subtraction (-=)", m3, expected_sub);
+        
+        // Test *=
+        SquareMat m5 = create_test_matrix(3, 1.0);
+        SquareMat m6 = create_test_matrix(3, 2.0);
+        SquareMat expected_mul = m5 * m6;
+        
+        m5 *= m6;
+        assert_matrix_equal("Compound Multiplication (*=)", m5, expected_mul);
+        
+        // Test *= (scalar)
+        SquareMat m7 = create_test_matrix(3);
+        double scalar = 2.5;
+        SquareMat expected_scalar_mul = m7 * scalar;
+        
+        m7 *= scalar;
+        assert_matrix_equal("Compound Scalar Multiplication (*=)", m7, expected_scalar_mul);
+        
+        // Test /=
+        SquareMat m8 = create_test_matrix(3);
+        double divisor = 2.0;
+        SquareMat expected_div = m8 / divisor;
+        
+        m8 /= divisor;
+        assert_matrix_equal("Compound Division (/=)", m8, expected_div);
+        
+        // Test %=
+        SquareMat m9 = create_test_matrix(3, 1.0);
+        SquareMat m10 = create_test_matrix(3, 2.0);
+        SquareMat expected_elem_mul = m9 % m10;
+        
+        m9 %= m10;
+        assert_matrix_equal("Compound Element-wise Multiplication (%=)", m9, expected_elem_mul);
+        
+        // Test %= (scalar)
+        SquareMat m11 = create_test_matrix(3, 10.0);
+        int mod = 3;
+        SquareMat expected_mod = m11 % mod;
+        
+        m11 %= mod;
+        assert_matrix_equal("Compound Modulo (%=)", m11, expected_mod);
+    }
+};
+
+int main() {
+    std::cout << "=== Square Matrix Test Suite ===" << std::endl;
+    
+    SquareMatTests tests;
+    tests.run_all_tests();
+    
+    std::cout << "\nAll tests completed!" << std::endl;
+    return 0;
+}
+---
+
+i dont want all the tests, give me an example on one method
+
+---
+I understand! Instead of a comprehensive test suite for all methods, let's create a simpler test program that focuses on testing just one method of your `SquareMat` class. This will serve as an example of how you can create tests for the other methods.
+
+I've created a simple test program that demonstrates how to test one method from your `SquareMat` class - specifically, the matrix addition operator (`+`).
+
+### How the Test Works
+
+This example shows a focused approach to testing just one method:
+
+1. **Helper Functions**:
+   - `assert_equal`: A simple assertion function that checks if two values are equal within a small epsilon (to handle floating-point comparisons)
+   - `create_test_matrix`: Creates a test matrix with predictable values
+   - `print_matrix`: Displays a matrix for visual inspection
+
+2. **Test Addition Method**:
+   - Creates two 3x3 matrices with different initial values
+   - Prints both matrices for visual reference
+   - Performs matrix addition (`m1 + m2`)
+   - Prints the result
+   - Verifies each element in the result matrix against the expected values
+   - Also tests the edge case of adding matrices with different sizes
+
+### How to Adapt for Other Methods
+
+You can use this as a template to test other methods by:
+
+1. Creating a new test function (e.g., `test_multiplication()`, `test_determinant()`, etc.)
+2. Setting up the appropriate test matrices
+3. Calling the method to test
+4. Comparing the actual result with the expected result using `assert_equal()`
+
+### Compilation and Execution
+
+To compile and run this test:
+
+```bash
+g++ -o matrix_test simple_matrix_test.cpp square_mat.cpp
+./matrix_test
+```
+
+For each method you want to test, you could create a similar focused test function, or you could combine multiple test functions in a single program and call them sequentially.
+
+Would you like me to demonstrate testing another specific method, or would you like guidance on how to create a more streamlined test framework that you can easily extend for all methods?
+
+#include "square_mat.h"
+#include <iostream>
+#include <string>
+#include <cmath>
+
+using namespace matrix;
+
+// Simple assertion function for testing
+void assert_equal(const std::string& test_name, double actual, double expected, double epsilon = 0.00001) {
+    if (std::abs(actual - expected) < epsilon) {
+        std::cout << "✓ " << test_name << " passed!" << std::endl;
+    } else {
+        std::cout << "✗ " << test_name << " failed! Expected: " << expected << ", Got: " << actual << std::endl;
+    }
+}
+
+// Helper function to create a matrix
+SquareMat create_test_matrix(int size, double initial_value = 1.0) {
+    double** arr = new double*[size];
+    for (int i = 0; i < size; i++) {
+        arr[i] = new double[size];
+        for (int j = 0; j < size; j++) {
+            arr[i][j] = initial_value + i + j;
+        }
+    }
+    
+    SquareMat mat(arr, size);
+    
+    // Free the memory used by the array
+    for (int i = 0; i < size; i++) {
+        delete[] arr[i];
+    }
+    delete[] arr;
+    
+    return mat;
+}
+
+// Print a matrix for debugging
+void print_matrix(const SquareMat& mat) {
+    std::cout << "Matrix " << mat.size << "x" << mat.size << ":" << std::endl;
+    for (int i = 0; i < mat.size; i++) {
+        for (int j = 0; j < mat.size; j++) {
+            std::cout << mat[i][j] << " ";
+        }
+        std::cout << std::endl;
+    }
+}
+
+// Test the matrix addition method
+void test_addition() {
+    std::cout << "\n=== Testing Matrix Addition ===" << std::endl;
+    
+    // Create two test matrices
+    SquareMat m1 = create_test_matrix(3, 1.0);
+    SquareMat m2 = create_test_matrix(3, 2.0);
+    
+    std::cout << "Matrix 1:" << std::endl;
+    print_matrix(m1);
+    
+    std::cout << "Matrix 2:" << std::endl;
+    print_matrix(m2);
+    
+    // Perform addition
+    SquareMat result = m1 + m2;
+    
+    std::cout << "Result of addition:" << std::endl;
+    print_matrix(result);
+    
+    // Verify each element in the result
+    for (int i = 0; i < 3; i++) {
+        for (int j = 0; j < 3; j++) {
+            double expected = m1[i][j] + m2[i][j];
+            assert_equal("Addition [" + std::to_string(i) + "][" + std::to_string(j) + "]",
+                         result[i][j], expected);
+        }
+    }
+    
+    // Test addition with different size matrices (should return empty matrix)
+    SquareMat m3(2);  // 2x2 zero matrix
+    SquareMat invalid_result = m1 + m3;
+    assert_equal("Addition with different sizes", invalid_result.size, 0);
+    
+    std::cout << "Addition test completed!" << std::endl;
+}
+
+int main() {
+    std::cout << "=== Simple Matrix Test ===" << std::endl;
+    
+    // Run the addition test
+    test_addition();
+    
+    return 0;
+}
+---
