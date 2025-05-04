@@ -373,12 +373,5 @@ int main()
     test_comparison_operators();
     test_compound_assignment_operators();
 
-    // Print summary
-    // cout << "\n=== Test Summary ===\n";
-    // cout << "Passed: " << passedTests << " / " << totalTests << " tests" << endl;
-    // cout << "Success rate: " << fixed << setprecision(2)
-    //      << (totalTests > 0 ? (passedTests * 100.0 / totalTests) : 0) << "%" << endl;
-
-    // return (passedTests == totalTests) ? 0 : 1; // Return success only if all tests passed
     return 0;
 }
