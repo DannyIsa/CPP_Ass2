@@ -8,18 +8,16 @@ namespace matrix
     // Constructor with array input
     SquareMat::SquareMat(double **arr, int n) : size(n) // Initialize size in constructor
     {
-        // Make sure size is positive
+        // Check if size is valid
         if (n <= 0)
         {
             size = 0;
-            data = nullptr; // Set data to null
+            data = nullptr;
             return;
         }
 
-        // Allocate memory for the matrix
         data = new double *[size];
 
-        // Copy values from input array
         for (int i = 0; i < size; i++)
         {
             data[i] = new double[size];
@@ -41,14 +39,13 @@ namespace matrix
             return;
         }
 
-        // Allocate memory and initialize to zeros
         data = new double *[size];
         for (int i = 0; i < size; i++)
         {
             data[i] = new double[size];
             for (int j = 0; j < size; j++)
             {
-                data[i][j] = 0.0; // Set all elements to zero
+                data[i][j] = 0.0;
             }
         }
     }
@@ -63,16 +60,13 @@ namespace matrix
             return;
         }
 
-        // Allocate memory
         data = new double *[size];
 
-        // Copy values from other matrix
         for (int i = 0; i < size; i++)
         {
             data[i] = new double[size];
             for (int j = 0; j < size; j++)
             {
-                // Copy each element
                 data[i][j] = other.data[i][j];
             }
         }
@@ -89,7 +83,7 @@ namespace matrix
             {
                 delete[] data[i];
             }
-            // Then delete the array of pointers
+            // Delete the array of pointers
             delete[] data;
         }
     }
@@ -101,7 +95,6 @@ namespace matrix
         if (this == &other)
             return *this;
 
-        // Free existing memory
         if (data != nullptr)
         {
             for (int i = 0; i < size; i++)
@@ -111,7 +104,6 @@ namespace matrix
             delete[] data;
         }
 
-        // Copy from other matrix
         size = other.size;
 
         if (size <= 0)
@@ -120,14 +112,13 @@ namespace matrix
             return *this;
         }
 
-        // Allocate new memory
         data = new double *[size];
         for (int i = 0; i < size; i++)
         {
             data[i] = new double[size];
             for (int j = 0; j < size; j++)
             {
-                data[i][j] = other.data[i][j]; // Copy values
+                data[i][j] = other.data[i][j];
             }
         }
 
@@ -137,12 +128,11 @@ namespace matrix
     // Access operators - allows using m[i][j] syntax
     double *SquareMat::operator[](int i)
     {
-        // Check if index is valid
         if (i < 0 || i >= size)
         {
-            return nullptr; // Return null for invalid index
+            return nullptr;
         }
-        return data[i]; // Return pointer to row i
+        return data[i];
     }
 
     const double *SquareMat::operator[](int i) const
@@ -158,19 +148,17 @@ namespace matrix
     // Helper method to calculate sum of all elements
     double SquareMat::calculateSum() const
     {
-        // Initialize sum to zero
         double sum = 0.0;
 
-        // Add up all elements in the matrix
         for (int i = 0; i < size; i++)
         {
             for (int j = 0; j < size; j++)
             {
-                sum += data[i][j]; // Add current element to sum
+                sum += data[i][j];
             }
         }
 
-        return sum; // Return the total sum
+        return sum;
     }
 
     // Get cofactor of matrix (submatrix without row p and column q)
@@ -179,7 +167,7 @@ namespace matrix
         int n = size;
         // Create array for the cofactor (smaller by 1 in each dimension)
         double *cofactor = new double[(n - 1) * (n - 1)];
-        int i = 0, j = 0; // indices for cofactor array
+        int i = 0, j = 0;
 
         // Loop through the original matrix
         for (int row = 0; row < n; row++)
@@ -202,26 +190,21 @@ namespace matrix
                 }
             }
         }
-        return cofactor; // Return the cofactor array
+        return cofactor;
     }
 
     // Calculate determinant using recursion
     double SquareMat::calculateDeterminant() const
     {
-        // Base cases
-        // For 1x1 matrix, determinant is the single element
         if (size == 1)
             return data[0][0];
 
-        // For 2x2 matrix, determinant is ad - bc
         if (size == 2)
             return data[0][0] * data[1][1] - data[0][1] * data[1][0];
 
-        // For larger matrices, use cofactor expansion
         double det = 0;
         int sign = 1; // Start with positive sign
 
-        // Expand along the first row
         for (int i = 0; i < size; i++)
         {
             // Get the cofactor (submatrix) for element (0,i)
@@ -245,7 +228,6 @@ namespace matrix
             // Formula: det += sign * element * det(cofactor)
             det += sign * data[0][i] * cofactorMat.calculateDeterminant();
 
-            // Clean up memory
             for (int j = 0; j < size - 1; j++)
             {
                 delete[] temp[j];
@@ -253,7 +235,7 @@ namespace matrix
             delete[] temp;
             delete[] cofactor;
 
-            // Flip the sign for next term (alternating +/-)
+            // Flip the sign
             sign = -sign;
         }
 
@@ -263,16 +245,13 @@ namespace matrix
     // Addition operator (m1 + m2)
     SquareMat SquareMat::operator+(const SquareMat &other) const
     {
-        // Check if matrices have same size
         if (size != other.size)
         {
-            return SquareMat(0); // Return empty matrix if sizes don't match
+            return SquareMat(0);
         }
 
-        // Create result matrix
         SquareMat result(size);
 
-        // Add corresponding elements
         for (int i = 0; i < size; i++)
         {
             for (int j = 0; j < size; j++)
@@ -286,16 +265,13 @@ namespace matrix
     // Subtraction operator (m1 - m2)
     SquareMat SquareMat::operator-(const SquareMat &other) const
     {
-        // Check if matrices have same size
         if (size != other.size)
         {
-            return SquareMat(0); // Return empty matrix if sizes don't match
+            return SquareMat(0);
         }
 
-        // Create result matrix
         SquareMat result(size);
 
-        // Subtract corresponding elements
         for (int i = 0; i < size; i++)
         {
             for (int j = 0; j < size; j++)
@@ -309,10 +285,8 @@ namespace matrix
     // Unary minus operator (-m1)
     SquareMat SquareMat::operator-() const
     {
-        // Create result matrix
         SquareMat result(size);
 
-        // Negate all elements
         for (int i = 0; i < size; i++)
         {
             for (int j = 0; j < size; j++)
@@ -326,23 +300,19 @@ namespace matrix
     // Matrix multiplication (m1 * m2)
     SquareMat SquareMat::operator*(const SquareMat &other) const
     {
-        // Check if matrices have same size
         if (size != other.size)
         {
-            return SquareMat(0); // Return empty matrix if sizes don't match
+            return SquareMat(0);
         }
 
-        // Create result matrix
         SquareMat result(size);
 
-        // Perform matrix multiplication
         for (int i = 0; i < size; i++)
         {
             for (int j = 0; j < size; j++)
             {
-                result.data[i][j] = 0; // Initialize element to 0
+                result.data[i][j] = 0;
 
-                // Calculate dot product of row i and column j
                 for (int k = 0; k < size; k++)
                 {
                     result.data[i][j] += data[i][k] * other.data[k][j];
@@ -355,10 +325,8 @@ namespace matrix
     // Scalar multiplication (m1 * scalar)
     SquareMat SquareMat::operator*(double scalar) const
     {
-        // Create result matrix
         SquareMat result(size);
 
-        // Multiply each element by scalar
         for (int i = 0; i < size; i++)
         {
             for (int j = 0; j < size; j++)
@@ -372,23 +340,19 @@ namespace matrix
     // Scalar multiplication (scalar * m1)
     SquareMat operator*(double scalar, const SquareMat &mat)
     {
-        // Just call the other multiplication operator
         return mat * scalar;
     }
 
     // Element-wise multiplication (m1 % m2)
     SquareMat SquareMat::operator%(const SquareMat &other) const
     {
-        // Check if matrices have same size
         if (size != other.size)
         {
-            return SquareMat(0); // Return empty matrix if sizes don't match
+            return SquareMat(0);
         }
 
-        // Create result matrix
         SquareMat result(size);
 
-        // Multiply corresponding elements
         for (int i = 0; i < size; i++)
         {
             for (int j = 0; j < size; j++)
@@ -402,21 +366,17 @@ namespace matrix
     // Modulo with scalar (m1 % scalar)
     SquareMat SquareMat::operator%(int scalar) const
     {
-        // Check for division by zero
         if (scalar == 0)
         {
-            return SquareMat(0); // Return empty matrix if scalar is zero
+            return SquareMat(0);
         }
 
-        // Create result matrix
         SquareMat result(size);
 
-        // Apply modulo to each element
         for (int i = 0; i < size; i++)
         {
             for (int j = 0; j < size; j++)
             {
-                // Cast to int, do modulo, store as double
                 result.data[i][j] = (int)data[i][j] % scalar;
             }
         }
@@ -426,16 +386,13 @@ namespace matrix
     // Division by scalar (m1 / scalar)
     SquareMat SquareMat::operator/(double scalar) const
     {
-        // Check for division by zero
         if (scalar == 0)
         {
-            return SquareMat(0); // Return empty matrix if scalar is zero
+            return SquareMat(0);
         }
 
-        // Create result matrix
         SquareMat result(size);
 
-        // Divide each element by scalar
         for (int i = 0; i < size; i++)
         {
             for (int j = 0; j < size; j++)
@@ -449,34 +406,31 @@ namespace matrix
     // Power operator (m1 ^ power)
     SquareMat SquareMat::operator^(int power) const
     {
-        // Handle negative power
         if (power < 0)
         {
-            return SquareMat(0); // Return empty matrix for negative power
+            return SquareMat(0);
         }
 
-        // Special case: power = 0 (identity matrix)
         if (power == 0)
         {
             SquareMat result(size);
             for (int i = 0; i < size; i++)
             {
-                result.data[i][i] = 1.0; // Set diagonal elements to 1
+                result.data[i][i] = 1.0; // Diagonal elements are 1
             }
             return result;
         }
 
-        // Special case: power = 1 (return copy of this matrix)
         if (power == 1)
         {
             return *this;
         }
 
-        // For powers > 1, multiply matrix by itself 'power' times
+        // Multiply matrix by itself 'power' times
         SquareMat result = *this;
         for (int i = 1; i < power; i++)
         {
-            result = result * (*this); // Multiply by original matrix
+            result = result * (*this);
         }
 
         return result;
@@ -560,22 +514,18 @@ namespace matrix
     // Equality operator (m1 == m2)
     bool SquareMat::operator==(const SquareMat &other) const
     {
-        // Matrices are equal if their sums are equal
-        // This is a simple way to compare matrices
         return calculateSum() == other.calculateSum();
     }
 
     // Inequality operator (m1 != m2)
     bool SquareMat::operator!=(const SquareMat &other) const
     {
-        // Matrices are not equal if their sums are not equal
         return calculateSum() != other.calculateSum();
     }
 
     // Less than operator (m1 < m2)
     bool SquareMat::operator<(const SquareMat &other) const
     {
-        // Matrix is less than another if its sum is less
         return calculateSum() < other.calculateSum();
     }
 
@@ -588,34 +538,29 @@ namespace matrix
     // Less than or equal operator (m1 <= m2)
     bool SquareMat::operator<=(const SquareMat &other) const
     {
-        // Matrix is less than or equal if its sum is less than or equal
         return calculateSum() <= other.calculateSum();
     }
 
     // Greater than or equal operator (m1 >= m2)
     bool SquareMat::operator>=(const SquareMat &other) const
     {
-        // Matrix is greater than or equal if its sum is greater than or equal
         return calculateSum() >= other.calculateSum();
     }
 
     // Determinant operator (!m)
     double SquareMat::operator!() const
     {
-        // Calculate determinant using helper method
         return calculateDeterminant();
     }
 
     // Compound addition (m1 += m2)
     SquareMat &SquareMat::operator+=(const SquareMat &other)
     {
-        // Check if matrices have same size
         if (size != other.size)
         {
-            return *this; // Return unchanged if sizes don't match
+            return *this;
         }
 
-        // Add corresponding elements
         for (int i = 0; i < size; i++)
         {
             for (int j = 0; j < size; j++)
@@ -629,13 +574,11 @@ namespace matrix
     // Compound subtraction (m1 -= m2)
     SquareMat &SquareMat::operator-=(const SquareMat &other)
     {
-        // Check if matrices have same size
         if (size != other.size)
         {
-            return *this; // Return unchanged if sizes don't match
+            return *this;
         }
 
-        // Subtract corresponding elements
         for (int i = 0; i < size; i++)
         {
             for (int j = 0; j < size; j++)
@@ -649,23 +592,20 @@ namespace matrix
     // Compound matrix multiplication (m1 *= m2)
     SquareMat &SquareMat::operator*=(const SquareMat &other)
     {
-        // Check if matrices have same size
         if (size != other.size)
         {
-            return *this; // Return unchanged if sizes don't match
+            return *this;
         }
 
         // Create temporary matrix for result
         SquareMat result(size);
 
-        // Perform matrix multiplication
         for (int i = 0; i < size; i++)
         {
             for (int j = 0; j < size; j++)
             {
-                result.data[i][j] = 0; // Initialize to 0
+                result.data[i][j] = 0;
 
-                // Calculate dot product of row i and column j
                 for (int k = 0; k < size; k++)
                 {
                     result.data[i][j] += data[i][k] * other.data[k][j];
@@ -681,7 +621,6 @@ namespace matrix
     // Compound scalar multiplication (m1 *= scalar)
     SquareMat &SquareMat::operator*=(double scalar)
     {
-        // Multiply each element by scalar
         for (int i = 0; i < size; i++)
         {
             for (int j = 0; j < size; j++)
@@ -698,10 +637,9 @@ namespace matrix
         // Check for division by zero
         if (scalar == 0)
         {
-            return *this; // Return unchanged if scalar is zero
+            return *this;
         }
 
-        // Divide each element by scalar
         for (int i = 0; i < size; i++)
         {
             for (int j = 0; j < size; j++)
@@ -715,13 +653,11 @@ namespace matrix
     // Compound element-wise multiplication (m1 %= m2)
     SquareMat &SquareMat::operator%=(const SquareMat &other)
     {
-        // Check if matrices have same size
         if (size != other.size)
         {
-            return *this; // Return unchanged if sizes don't match
+            return *this;
         }
 
-        // Multiply corresponding elements
         for (int i = 0; i < size; i++)
         {
             for (int j = 0; j < size; j++)
@@ -735,18 +671,15 @@ namespace matrix
     // Compound modulo with scalar (m1 %= scalar)
     SquareMat &SquareMat::operator%=(int scalar)
     {
-        // Check for modulo by zero
         if (scalar == 0)
         {
-            return *this; // Return unchanged if scalar is zero
+            return *this;
         }
 
-        // Apply modulo to each element
         for (int i = 0; i < size; i++)
         {
             for (int j = 0; j < size; j++)
             {
-                // Cast to int, do modulo, store as double
                 data[i][j] = (int)data[i][j] % scalar;
             }
         }
@@ -756,18 +689,14 @@ namespace matrix
     // Output operator (nullptr << m)
     void operator<<(void *os, const SquareMat &mat)
     {
-        // Get matrix size
         int size = mat.size;
 
-        // Print each element
         for (int i = 0; i < size; i++)
         {
             for (int j = 0; j < size; j++)
             {
-                // Get current value
                 double val = mat.data[i][j];
 
-                // Convert to string
                 std::string valStr = std::to_string(val);
 
                 // Format to 2 decimal places
@@ -780,11 +709,9 @@ namespace matrix
                 // Print value
                 std::cout << valStr;
 
-                // Add space between elements (except last one in row)
                 if (j < size - 1)
                     std::cout << " ";
             }
-            // New line after each row
             std::cout << std::endl;
         }
     }
