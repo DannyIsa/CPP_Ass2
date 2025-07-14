@@ -15,8 +15,8 @@ test: test_square_mat.o square_mat.o
 test_square_mat.o: test_square_mat.cpp square_mat.h
 	g++ -Wall -std=c++11 -c test_square_mat.cpp
 
-valgrind: Main
-	valgrind --leak-check=full ./Main
+valgrind: test
+	valgrind --leak-check=full ./test
 
 clean:
 	rm -f *.o Main Test
